@@ -1,80 +1,39 @@
 const { JSDOM } = require('jsdom');
 const queue = require('async/queue');
 const fs = require('fs');
+// import 'kufarCat';
 
 
-
-// kufar parser
-// const dataKufarCat = [];
-// (async () => {
-//     try {
-//         const dom = await JSDOM.fromURL('https://www.kufar.by/l/r~minsk/koshki');
-//         const d = dom.window.document;
-//         let linkAll = d.querySelectorAll('.kf-Yop-a43ab'); 
-//         linkAll.forEach(function(linkAll) { 
-//             let linkhref = ((linkAll.getAttribute('href')));
-//             dataKufarCat.push({link: linkhref});
-//         });
-//         let imgAll = d.querySelectorAll('.kf-MPpg-8a381');
-//         imgAll.forEach(function(imgAll) { 
-//             let imgLink = ((imgAll.getAttribute('data-src')));
-//             dataKufarCat.push({img: imgLink});
-//         });
-        
-//         let nameAll = d.querySelectorAll('div.kf-Yoxp-b5ab1 > h3');
-//         nameAll.forEach(function(nameAll) {
-//             let nameText = nameAll.textContent;
-//             dataKufarCat.push({name: nameText});
-//         });
-//         let priceAll = d.querySelectorAll('.kf-YopJ-ded05');
-//         priceAll.forEach(function(priceAll) { 
-//             let priceText = priceAll.textContent;
-//             dataKufarCat.push({price: priceText});
-//         });
-//         let updateAll = d.querySelectorAll('.kf-Yoxb-09b98');
-//         updateAll.forEach(function(updateAll) { 
-//             let updateText = updateAll.innerHTML;
-//             dataKufarCat.push({update: updateText});
-//         });
-//         if (dataKufarCat.length > 0) {
-//             // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataKufarCat));
-//             console.log(JSON.stringify(dataKufarCat, null, ' '));
-//             console.log(dataKufarCat.length);
-//         }
-//     } catch (e) {
-//         console.log(e);
-//     }
-// })();
 
 // const dataKufarDog = [];
 // (async () => {
 //     try {
 //         const dom = await JSDOM.fromURL('https://www.kufar.by/l/r~minsk/sobaki');
 //         const d = dom.window.document;
-//         let linkAll = d.querySelectorAll('.kf-Yop-a43ab'); 
+//         let linkAll = d.querySelectorAll('section > a'); 
 //         linkAll.forEach(function(linkAll) { 
 //             let linkhref = ((linkAll.getAttribute('href')));
 //             dataKufarDog.push({link: linkhref});
 //         });
-//         let imgAll = d.querySelectorAll('.kf-MPpg-8a381');
+//         let imgAll = d.querySelectorAll('section > a > div > div > div > img');
 //         imgAll.forEach(function(imgAll) { 
 //             let imgLink = ((imgAll.getAttribute('data-src')));
 //             dataKufarDog.push({img: imgLink});
 //         });
         
-//         let nameAll = d.querySelectorAll('div.kf-Yoxp-b5ab1 > h3');
+//         let nameAll = d.querySelectorAll('section > a > div > div > div > h3');
 //         nameAll.forEach(function(nameAll) {
 //             let nameText = nameAll.textContent;
 //             dataKufarDog.push({name: nameText});
 //         });
-//         let priceAll = d.querySelectorAll('.kf-YopJ-ded05');
+//         let priceAll = d.querySelectorAll('section > a > div > div > div > p > span:nth-child(1)');
 //         priceAll.forEach(function(priceAll) { 
 //             let priceText = priceAll.textContent;
 //             dataKufarDog.push({price: priceText});
 //         });
-//         let updateAll = d.querySelectorAll('.kf-Yoxb-09b98 > span');
-//         updateAll.forEach(function(updateAll) { 
-//             let updateText = updateAll.textContent;
+//         let updateAll = d.querySelectorAll('section > a > div > div > div > span');
+//         updateAll.forEach(async function(updateAll) {
+//             let updateText = updateAll.innerHTML;
 //             dataKufarDog.push({update: updateText});
 //         });
 //         if (dataKufarDog.length > 0) {
@@ -86,7 +45,6 @@ const fs = require('fs');
 //         console.log(e);
 //     }
 // })();
-
 
 
 
@@ -232,46 +190,91 @@ const fs = require('fs');
 
 
 
-www.doska.by dog parser
-Картинки надо получать с карточки!!
-обновление с карточек, а так же капут татйлами
-const dataDoskaDog = [];
-(async () => {
-    try {
-        const dom = await JSDOM.fromURL('https://www.doska.by/animals/cats/minsk-r/');
-        const d = dom.window.document;
-        let linkAll = d.querySelectorAll('.msga2 > a'); 
-        linkAll.forEach(function(linkAll) { 
-            let linkhref = ((linkAll.getAttribute('href')));
-            let linkhreffixed = 'doska.by' + linkhref;
-            dataDoskaDog.push({link: linkhreffixed});
-        });
-        let imgAll = d.querySelectorAll('.msga2 > a> img');
-        imgAll.forEach(function(imgAll) { 
-            let imgLink = ((imgAll.getAttribute('src')));
-            dataDoskaDog.push({img: imgLink});
-        });
-            let nameAll = d.querySelectorAll('.d1> a');
-            nameAll.forEach(function(nameAll) {
-                let nameText = nameAll.textContent;
-                dataDoskaDog.push({name: nameText});
-            });
-        let priceAll = d.querySelectorAll('.msga2-o pp6 >a');
-        priceAll.forEach(function(priceAll) { 
-            let priceText = priceAll.textContent;
-            dataDoskaDog.push({price: priceText});
-        });
-        // let updateAll = d.querySelectorAll('.kf-Yoxb-09b98 > span');
-        // updateAll.forEach(function(updateAll) { 
-        //     let updateText = updateAll.textContent;
-        //     dataDoskaDog.push({update: updateText});
-        // });
-        if (dataDoskaDog.length > 0) {
-            // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataDoskaDog));
-            console.log(JSON.stringify(dataDoskaDog, null, ' '));
-            console.log(dataDoskaDog.length);
-        }
-    } catch (e) {
-        console.log(e);
-    }
-})();
+// // www.doska.by dog parser
+// // Картинки надо получать с карточки!!
+// // обновление с карточек, а так же капут татйлами
+// const dataDoskaCat = [];
+// (async () => {
+//     try {
+//         const dom = await JSDOM.fromURL('https://www.doska.by/animals/cats/minsk-r/');
+//         const d = dom.window.document;
+//         // let linkAll = d.querySelectorAll('.msga2 > a'); 
+//         // linkAll.forEach(function(linkAll) { 
+//         //     let linkhref = ((linkAll.getAttribute('href')));
+//         //     let linkhreffixed = 'doska.by' + linkhref;
+//         //     dataDoskaCat.push({link: linkhreffixed});
+//         // });
+//         // let imgAll = d.querySelectorAll('.msga2 > a> img');
+//         // imgAll.forEach(function(imgAll) { 
+//         //     let imgLink = ((imgAll.getAttribute('src')));
+//         //     dataDoskaCat.push({img: imgLink});
+//         // });
+//         //     let nameAll = d.querySelectorAll('.d1> a');
+//         //     nameAll.forEach(function(nameAll) {
+//         //         let nameText = nameAll.textContent;
+//         //         dataDoskaCat.push({name: nameText});
+//         //     });
+//         let priceAll = d.querySelectorAll('td:nth-child(6)');
+//         priceAll.forEach(function(priceAll) { 
+//             let priceText = priceAll.textContent;
+//             dataDoskaCat.push({price: priceText});
+//         });
+//         // let updateAll = d.querySelectorAll('.kf-Yoxb-09b98 > span');
+//         // updateAll.forEach(function(updateAll) { 
+//         //     let updateText = updateAll.textContent;
+//         //     dataDoskaCat.push({update: updateText});
+//         // });
+//         if (dataDoskaCat.length > 0) {
+//             // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataDoskaCat));
+//             console.log(JSON.stringify(dataDoskaCat, null, ' '));
+//             console.log(dataDoskaCat.length);
+//         }
+//     } catch (e) {
+//         console.log(e);
+//     }
+// })();
+
+
+
+
+// // https://egida.by/ cat parser
+// const dataEgidaCat = [];
+// (async () => {
+//     try {
+//         const dom = await JSDOM.fromURL('https://www.doska.by/animals/cats/minsk-r/');
+//         const d = dom.window.document;
+//         let linkAll = d.querySelectorAll('.msga2 > a'); 
+//         linkAll.forEach(function(linkAll) { 
+//             let linkhref = ((linkAll.getAttribute('href')));
+//             let linkhreffixed = 'doska.by' + linkhref;
+//             dataEgidaCat.push({link: linkhreffixed});
+//         });
+//         let imgAll = d.querySelectorAll('.msga2 > a> img');
+//         imgAll.forEach(function(imgAll) { 
+//             let imgLink = ((imgAll.getAttribute('src')));
+//             dataEgidaCat.push({img: imgLink});
+//         });
+//             let nameAll = d.querySelectorAll('.d1> a');
+//             nameAll.forEach(function(nameAll) {
+//                 let nameText = nameAll.textContent;
+//                 dataEgidaCat.push({name: nameText});
+//             });
+//         let priceAll = d.querySelectorAll('.msga2-o pp6 >a');
+//         priceAll.forEach(function(priceAll) { 
+//             let priceText = priceAll.textContent;
+//             dataEgidaCat.push({price: priceText});
+//         });
+//         // let updateAll = d.querySelectorAll('.kf-Yoxb-09b98 > span');
+//         // updateAll.forEach(function(updateAll) { 
+//         //     let updateText = updateAll.textContent;
+//         //     dataEgidaCat.push({update: updateText});
+//         // });
+//         if (dataEgidaCat.length > 0) {
+//             // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataEgidaCat));
+//             console.log(JSON.stringify(dataEgidaCat, null, ' '));
+//             console.log(dataEgidaCat.length);
+//         }
+//     } catch (e) {
+//         console.log(e);
+//     }
+// })();
