@@ -190,30 +190,30 @@ const fs = require('fs');
 
 
 
-// // www.doska.by dog parser
-// // Картинки надо получать с карточки!!
-// // обновление с карточек, а так же капут татйлами
+// www.doska.by dog parser
+// Картинки надо получать с карточки!!
+// обновление с карточек, а так же капут татйлами
 // const dataDoskaCat = [];
 // (async () => {
 //     try {
 //         const dom = await JSDOM.fromURL('https://www.doska.by/animals/cats/minsk-r/');
 //         const d = dom.window.document;
-//         // let linkAll = d.querySelectorAll('.msga2 > a'); 
-//         // linkAll.forEach(function(linkAll) { 
-//         //     let linkhref = ((linkAll.getAttribute('href')));
-//         //     let linkhreffixed = 'doska.by' + linkhref;
-//         //     dataDoskaCat.push({link: linkhreffixed});
-//         // });
-//         // let imgAll = d.querySelectorAll('.msga2 > a> img');
-//         // imgAll.forEach(function(imgAll) { 
-//         //     let imgLink = ((imgAll.getAttribute('src')));
-//         //     dataDoskaCat.push({img: imgLink});
-//         // });
-//         //     let nameAll = d.querySelectorAll('.d1> a');
-//         //     nameAll.forEach(function(nameAll) {
-//         //         let nameText = nameAll.textContent;
-//         //         dataDoskaCat.push({name: nameText});
-//         //     });
+//         let linkAll = d.querySelectorAll('.msga2 > a'); 
+//         linkAll.forEach(function(linkAll) { 
+//             let linkhref = ((linkAll.getAttribute('href')));
+//             let linkhreffixed = 'doska.by' + linkhref;
+//             dataDoskaCat.push({link: linkhreffixed});
+//         });
+//         let imgAll = d.querySelectorAll('.msga2 > a> img');
+//         imgAll.forEach(function(imgAll) { 
+//             let imgLink = ((imgAll.getAttribute('src')));
+//             dataDoskaCat.push({img: imgLink});
+//         });
+//             let nameAll = d.querySelectorAll('.d1> a');
+//             nameAll.forEach(function(nameAll) {
+//                 let nameText = nameAll.textContent;
+//                 dataDoskaCat.push({name: nameText});
+//             });
 //         let priceAll = d.querySelectorAll('td:nth-child(6)');
 //         priceAll.forEach(function(priceAll) { 
 //             let priceText = priceAll.textContent;
@@ -225,7 +225,7 @@ const fs = require('fs');
 //         //     dataDoskaCat.push({update: updateText});
 //         // });
 //         if (dataDoskaCat.length > 0) {
-//             // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataDoskaCat));
+//             fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataDoskaCat));
 //             console.log(JSON.stringify(dataDoskaCat, null, ' '));
 //             console.log(dataDoskaCat.length);
 //         }

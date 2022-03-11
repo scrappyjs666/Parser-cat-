@@ -2,6 +2,8 @@ const { JSDOM } = require('jsdom');
 const queue = require('async/queue');
 const fs = require('fs');
 
+//Доделать дату апдейта
+
 const dataKufarDog = [];
 (async () => {
     try {
@@ -34,7 +36,7 @@ const dataKufarDog = [];
             dataKufarDog.push({update: updateText});
         });
         if (dataKufarDog.length > 0) {
-            // fs.writeFileSync('./resultKufarCat.txt', JSON.stringify(dataKufarDog));
+            // fs.writeFileSync('./resultKufarDog.txt', JSON.stringify(dataKufarDog));
             console.log(JSON.stringify(dataKufarDog, null, ' '));
             console.log(dataKufarDog.length);
         }

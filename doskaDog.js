@@ -2,7 +2,7 @@ const { JSDOM } = require('jsdom');
 const queue = require('async/queue');
 const fs = require('fs');
 
-const dataDoskaCat = [];
+const dataDoskaDogs = [];
 
 /**
  * @param {string} url - ссылка для парсинга
@@ -20,19 +20,19 @@ async function parse(url, isDetailed) {
             linkAll.forEach(function(linkAll) { 
             let linkhref = ((linkAll.getAttribute('href')));
             let linkhreffixed = 'doska.by' + linkhref;
-            dataDoskaCat.push({link: linkhreffixed});
+            dataDoskaDogs.push({link: linkhreffixed});
             });
 
             let nameAll = d.querySelectorAll('.d1> a');
             nameAll.forEach(function(nameAll) {
                 let nameText = nameAll.textContent;
-                dataDoskaCat.push({name: nameText});
+                dataDoskaDogs.push({name: nameText});
             });
 
             let priceAll = d.querySelectorAll('td:nth-child(6)');
             priceAll.forEach(function(priceAll) { 
             let priceText = priceAll.textContent.replace(/\s+/g, ' ').trim();
-            dataDoskaCat.push({price: priceText});
+            dataDoskaDogs.push({price: priceText});
             });
 
 
@@ -55,28 +55,28 @@ async function parse(url, isDetailed) {
             console.log(`Обработка карточки товара ${url}`);
             const imgCat = d.querySelector('.ads_photo_label > div > div > a').getAttribute('href');
             console.log(imgCat);
-            dataDoskaCat.push({img: imgCat});
+            dataDoskaDogs.push({img: imgCat});
 
             const updateCat = d.querySelector("td > table > tbody > tr:nth-child(2) > td:nth-child(3)").textContent;
-            dataDoskaCat.push({update: updateCat});
+            dataDoskaDogs.push({update: updateCat});
         }
     } catch (e) {
         console.error(e);
     }
 }
 
-const q = queue(async (dataDoskaCat, done) => {
-    await parse(dataDoskaCat.url, dataDoskaCat.isDetailed);
+const q = queue(async (dataDoskaDogs, done) => {
+    await parse(dataDoskaDogs.url, dataDoskaDogs.isDetailed);
     done();
 } );
 
-q.push({url: 'https://www.doska.by/animals/cats/', isDetailed: false});
+q.push({url: 'https://www.doska.by/animals/dogs/', isDetailed: false});
 
 (async () => {
     await q.drain();
-    if (dataDoskaCat.length > 0) {
-        fs.writeFileSync('./resultDoskaCat.txt', JSON.stringify(dataDoskaCat));
-        console.log(`Сохранено ${dataDoskaCat.length} записей`);
+    if (dataDoskaDogs.length > 0) {
+        fs.writeFileSync('./resultDoskaDog.txt', JSON.stringify(dataDoskaDogs));
+        console.log(`Сохранено ${dataDoskaDogs.length} записей`);
     }
 })();
 
