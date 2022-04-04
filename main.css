@@ -2,8 +2,8 @@ body {
   font-family: cursive;
 }
 .cat-item {
-  width: 600px;
-  height: 700px;
+  width: 400px;
+  height: 600px;
   border: 1px solid #797abc;
   padding: 10px;
   border-radius: 7px;

@@ -14,32 +14,31 @@ async function parse(url, isDetailed) {
     const dom = await JSDOM.fromURL(url);
     const d = dom.window.document;
     if (!isDetailed) {
-      let linkAll = d.querySelectorAll('.msga2 > a');
+      let linkAll = d.querySelectorAll('.title');
       linkAll.forEach((linkAll) => {
         let linkhref = ((linkAll.getAttribute('href')));
-        let linkhreffixed = 'doska.by' + linkhref;
         data.push({
-          link: linkhreffixed
+          link: linkhref
         });
       });
-      let nameAll = d.querySelectorAll('.d1> a');
+      let nameAll = d.querySelectorAll('.title');
       nameAll.forEach((nameAll) => {
         let nameText = nameAll.textContent;
         data.push({
           name: nameText
         });
       });
-      let priceAll = d.querySelectorAll('td:nth-child(6)');
+      let priceAll = d.querySelectorAll('.type_button');
       priceAll.forEach((priceAll) => {
-        let priceText = priceAll.textContent.replace(/\s+/g, ' ').trim();
+        let priceText = priceAll.textContent;
         data.push({
           price: priceText
         });
       });
       console.log(`Обработка страницы ${url}`);
-      const catsCard = d.querySelectorAll('.msga2');
+      const catsCard = d.querySelectorAll('.item_outer_in');
       catsCard.forEach(catsCard => {
-        const linkCat = catsCard.querySelector('.msga2 > a');
+        const linkCat = catsCard.querySelector('.title');
         if (linkCat) {
           const detailedUrl = linkCat.href;
           q.push({
@@ -48,9 +47,9 @@ async function parse(url, isDetailed) {
           });
         }
       });
-      const next = d.querySelector('msga2 > a');
+      const next = d.querySelector('.title');
       if (next) {
-        const nextUrl = 'doska.by' + next.getAttribute('href');
+        const nextUrl = 'https://zooby.by/' + next.getAttribute('href');
         q.push({
           url: nextUrl,
           isDetailed: false
@@ -58,12 +57,12 @@ async function parse(url, isDetailed) {
       }
     } else {
       console.log(`Обработка карточки товара ${url}`);
-      const imgCat = d.querySelector('.ads_photo_label > div > div > a').getAttribute('href');
+      const imgCat = d.querySelector('#djc_mainimage').getAttribute('src');
       console.log(imgCat);
       data.push({
         img: imgCat
       });
-      const updateCat = d.querySelector("td > table > tbody > tr:nth-child(2) > td:nth-child(3)").textContent;
+      const updateCat = d.querySelector('.general_det_in').childNodes[2].textContent.trim();
       data.push({
         update: updateCat
       });
@@ -77,13 +76,13 @@ const q = queue(async(data, done) => {
   done();
 });
 q.push({
-  url: 'https://www.doska.by/animals/dogs/',
+  url: 'https://zooby.by/v-dobrye-ruki/otdam-sobaku',
   isDetailed: false
 });
 (async() => {
   await q.drain();
   if (data.length > 0) {
-    fs.writeFileSync('./resultDoskaDog.txt', JSON.stringify(data));
+    fs.writeFileSync('./resultZooDog.txt', JSON.stringify(data));
     console.log(`Сохранено ${data.length} записей`);
   }
 })();

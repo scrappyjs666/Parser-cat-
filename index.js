@@ -1,82 +1,117 @@
-const { JSDOM } = require('jsdom');
-const queue = require('async/queue');
-const fs = require('fs');
+// const {
+//   JSDOM
+// } = require('jsdom');
+// const queue = require('async/queue');
+// const fs = require('fs');
+// const data = [];
+// /**
+//  * @param {string} url - ссылка для парсинга
+//  * @param {boolean} isDetailed - истина, если парсим страницу с карточкой товара
+//  * @return {Promise<void>}
+//  */
+// async function parse(url, isDetailed) {
+//   try {
+//     const dom = await JSDOM.fromURL(url);
+//     const d = dom.window.document;
+//     if (!isDetailed) {
+//       let linkAll = d.querySelectorAll('.title');
+//       linkAll.forEach((linkAll) => {
+//         let linkhref = ((linkAll.getAttribute('href')));
+//         data.push({
+//           link: linkhref
+//         });
+//       });
+//       let nameAll = d.querySelectorAll('.title');
+//       nameAll.forEach((nameAll) => {
+//         let nameText = nameAll.textContent;
+//         data.push({
+//           name: nameText
+//         });
+//       });
+//       let priceAll = d.querySelectorAll('.type_button');
+//       priceAll.forEach((priceAll) => {
+//         let priceText = priceAll.textContent;
+//         data.push({
+//           price: priceText
+//         });
+//       });
+//       console.log(`Обработка страницы ${url}`);
+//       const catsCard = d.querySelectorAll('.item_outer_in');
+//       catsCard.forEach(catsCard => {
+//         const linkCat = catsCard.querySelector('.title');
+//         if (linkCat) {
+//           const detailedUrl = linkCat.href;
+//           q.push({
+//             url: detailedUrl,
+//             isDetailed: true
+//           });
+//         }
+//       });
+//       const next = d.querySelector('.title');
+//       if (next) {
+//         const nextUrl = 'https://zooby.by/' + next.getAttribute('href');
+//         q.push({
+//           url: nextUrl,
+//           isDetailed: false
+//         });
+//       }
+//     } else {
+//       console.log(`Обработка карточки товара ${url}`);
+//       const imgCat = d.querySelector('#djc_mainimage').getAttribute('src');
+//       console.log(imgCat);
+//       data.push({
+//         img: imgCat
+//       });
+//       const updateCat = d.querySelector('.general_det_in').childNodes[2].textContent.trim();
+//       data.push({
+//         update: updateCat
+//       });
+      
+//     }
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
+// const q = queue(async(data, done) => {
+//   await parse(data.url, data.isDetailed);
+//   done();
+// });
+// q.push({
+//   url: 'https://zooby.by/v-dobrye-ruki/otdam-sobaku',
+//   isDetailed: false
+// });
+// (async() => {
+//   await q.drain();
+//   if (data.length > 0) {
+//     fs.writeFileSync('./resultZooDog.txt', JSON.stringify(data));
+//     console.log(`Сохранено ${data.length} записей`);
+//   }
+// })();
 
-const data = [];
-
-/**
- * @param {string} url - ссылка для парсинга
- * @param {boolean} isDetailed - истина, если парсим страницу с карточкой товара
- * @return {Promise<void>}
- */
-async function parse(url, isDetailed) {
-    try {
-        const dom = await JSDOM.fromURL(url);
-        const d = dom.window.document;
-
-        if (!isDetailed) {
-
-        let priceAll = d.querySelectorAll('.cost');
-        priceAll.forEach((priceAll) => {
-            if(priceAll.querySelector('.cost .price-primary') !== null) {
-                let priceText = d.querySelector('.price-primary');
-                let priceTextFixed = priceText.textContent.trim();
-                console.log(priceText);
-                data.push({price: priceTextFixed});
-            } else {
-                let priceText = priceAll.innerText = 'Не указана/ Бесплатно!'
-                console.log(priceText);
-                data.push({price: priceText});
-            }
-            });
-
-            let updateAll = d.querySelectorAll('.ba-post-up');
-            updateAll.forEach((updateAll) => { 
-            let updateText = updateAll.textContent;
-            data.push({update: updateText});
-            }); 
-
-            let linkAll = d.querySelectorAll('.wraptxt > a');
-            linkAll.forEach((linkAll) => { 
-            let linkteText = linkAll.href;
-            data.push({link: linkteText});
-            }); 
-
-            
-            console.log(`Обработка страницы ${url}`);
-            const catsCard = d.querySelectorAll('.img-va');
-            catsCard.forEach(catsCard => {
-                const linkCat = catsCard.querySelector('.img-va > a');
-                if (linkCat) {
-                    const detailedUrl = linkCat.href;
-                    q.push({url: detailedUrl, isDetailed: true});
-                }
-            });
-        if (next) {
-        }
-        } else {
-            console.log(`Обработка карточки товара ${url}`);
-            const imgCat = d.querySelector('.msgpost-img').getAttribute('src');
-            const nameCat = d.querySelector('.title').textContent;
-
-            data.push({name: nameCat, img: imgCat});
-        }
-    } catch (e) {
-        console.error(e);
-    }
+const allcats = document.querySelector('.allcats')
+let razmetka = '';
+let btn = document.querySelector('.button1');
+btn.addEventListener('click', createitem)
+async function createitem() {
+  try {
+    await fetch("/resultZooDog.txt")
+    .then(r => r.json())
+    .then(razm =>razmetka = razm)
+    console.log(razmetka);
+    allcats.innerHTML = razmetka;
+    console.log(razmetka.link)
+  } catch(error) {
+    console.log(error);
+  }
 }
 
-const q = queue(async (data, done) => {
-    await parse(data.url, data.isDetailed);
-    done();
-} );
 
-q.push({url: 'https://baraholka.onliner.by/viewforum.php?f=607&cat=1&start=0', isDetailed: false});
-
-(async () => {
-    await q.drain();
-    if (data.length > 0) {
-        fs.writeFileSync('./resultOnlinerCat.txt', JSON.stringify(data));
-        console.log(`Сохранено ${data.length} записей`);
-    }
-})();
+  // try {
+  //   fetch("/resultZooDog.txt")
+  //   .then(r => r.json())
+  //   .then(data => 
+  //   document.querySelector('.allcats').innerHTML = JSON.stringify(data))
+  //   .then 
+  // } catch(error) {
+  //   console.log(error);
+  // }
