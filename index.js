@@ -14,59 +14,33 @@
 //     const dom = await JSDOM.fromURL(url);
 //     const d = dom.window.document;
 //     if (!isDetailed) {
-//       let linkAll = d.querySelectorAll('.title');
-//       linkAll.forEach((linkAll) => {
-//         let linkhref = ((linkAll.getAttribute('href')));
-//         data.push({
-//           link: linkhref
-//         });
-//       });
-//       let nameAll = d.querySelectorAll('.title');
-//       nameAll.forEach((nameAll) => {
-//         let nameText = nameAll.textContent;
-//         data.push({
-//           name: nameText
-//         });
-//       });
-//       let priceAll = d.querySelectorAll('.type_button');
-//       priceAll.forEach((priceAll) => {
-//         let priceText = priceAll.textContent;
-//         data.push({
-//           price: priceText
-//         });
-//       });
-//       console.log(`Обработка страницы ${url}`);
+//       d.querySelectorAll('.item_row').forEach(row => {
+//       const region = row.querySelector('.item_region > a')?.textContent?.trim();
+//       if (region !== 'Минск') return;
+//       const price = row.querySelector('.type_button')?.textContent;
+//       const name = row.querySelector('.title')?.textContent;
+//       const link = 'https://zooby.by/' + row.querySelector('.title').getAttribute('href');
+//       data.push({name: name},{link: link},{price: price});
+//     });
 //       const catsCard = d.querySelectorAll('.item_outer_in');
-//       catsCard.forEach(catsCard => {
-//         const linkCat = catsCard.querySelector('.title');
+//       catsCard.forEach(i => {
+//         const linkCat = i.querySelector('.title');
 //         if (linkCat) {
 //           const detailedUrl = linkCat.href;
-//           q.push({
-//             url: detailedUrl,
-//             isDetailed: true
-//           });
+//           q.push({url: detailedUrl,isDetailed: true});
 //         }
 //       });
 //       const next = d.querySelector('.title');
 //       if (next) {
 //         const nextUrl = 'https://zooby.by/' + next.getAttribute('href');
-//         q.push({
-//           url: nextUrl,
-//           isDetailed: false
-//         });
+//         q.push({url: nextUrl,isDetailed: false});
 //       }
 //     } else {
-//       console.log(`Обработка карточки товара ${url}`);
-//       const imgCat = d.querySelector('#djc_mainimage').getAttribute('src');
-//       console.log(imgCat);
-//       data.push({
-//         img: imgCat
-//       });
-//       const updateCat = d.querySelector('.general_det_in').childNodes[2].textContent.trim();
-//       data.push({
-//         update: updateCat
-//       });
-      
+//       let item = d.querySelector('.localization_det > div > span').textContent.trim();
+//       if(item !== 'Минск, Беларусь') return
+//         const img = d.querySelector('#djc_mainimage').getAttribute('src');
+//         const update = d.querySelector('.general_det_in').childNodes[2].textContent.replace(/[^0-9, ]/g,"").trim();
+//         data.push({img:img}, {update:update});
 //     }
 //   } catch (e) {
 //     console.error(e);
@@ -78,28 +52,31 @@
 // });
 // q.push({
 //   url: 'https://zooby.by/v-dobrye-ruki/otdam-sobaku',
-//   isDetailed: false
-// });
+//   isDetailed: false});
 // (async() => {
 //   await q.drain();
 //   if (data.length > 0) {
+//     const now = new Date();
+//     const current = now.getHours() + ':' + now.getMinutes();
+//     data.push({currentDate: current})
 //     fs.writeFileSync('./resultZooDog.txt', JSON.stringify(data));
-//     console.log(`Сохранено ${data.length} записей`);
 //   }
 // })();
-
 const allcats = document.querySelector('.allcats')
-let razmetka = '';
+let data = '';
 let btn = document.querySelector('.button1');
 btn.addEventListener('click', createitem)
 async function createitem() {
   try {
     await fetch("/resultZooDog.txt")
     .then(r => r.json())
-    .then(razm =>razmetka = razm)
-    console.log(razmetka);
-    allcats.innerHTML = razmetka;
-    console.log(razmetka.link)
+    .then(arr => data = arr)
+    console.log(data);
+    for(let i = 0; i < data.length-1; i++) {
+      if(data[i].name !==  undefined) {
+        console.log(data[i].name);
+      }
+    }
   } catch(error) {
     console.log(error);
   }
@@ -115,3 +92,12 @@ async function createitem() {
   // } catch(error) {
   //   console.log(error);
   // }
+  // let all = [...document.querySelectorAll('.item_outer_in')];
+  // all.forEach(i => {
+  //   if(i.querySelector('.item_region').innerText == 'МинскПоказывать расстояние') 
+  //   {
+  //     data.push('https://zooby.by/'+i.querySelector('.title').getAttribute('href'));
+  //   }
+  // })
+ 
+
