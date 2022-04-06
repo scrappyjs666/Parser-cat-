@@ -14,32 +14,17 @@ async function parse(url, isDetailed) {
     const dom = await JSDOM.fromURL(url);
     const d = dom.window.document;
     if (!isDetailed) {
-      let linkAll = d.querySelectorAll('.msga2 > a');
-      linkAll.forEach((linkAll) => {
-        let linkhref = ((linkAll.getAttribute('href')));
-        let linkhreffixed = 'doska.by' + linkhref;
-        data.push({
-          link: linkhreffixed
-        });
-      });
-      let nameAll = d.querySelectorAll('.d1> a');
-      nameAll.forEach((nameAll) => {
-        let nameText = nameAll.textContent;
-        data.push({
-          name: nameText
-        });
-      });
-      let priceAll = d.querySelectorAll('td:nth-child(6)');
-      priceAll.forEach((priceAll) => {
-        let priceText = priceAll.textContent.replace(/\s+/g, ' ').trim();
-        data.push({
-          price: priceText
-        });
-      });
-      console.log(`Обработка страницы ${url}`);
+      d.querySelectorAll('form>:nth-child(3)>tbody>tr').forEach(i => {
+        const url = i.querySelector('.msga2 > a')?.getAttribute('href');
+        const link = url ? `https://www.doska.by/${url}` : undefined;
+        const name = i.querySelector('.d1> a')?.textContent;
+        let price = i.querySelector('td:nth-child(6)')?.textContent?.replace(/\s+/g, ' ')?.trim()
+        if(price == undefined || null || '' || ' ' || '-'){price = 'Не указано'}
+        data.push({link: link},{name: name},{price: price});
+      })
       const catsCard = d.querySelectorAll('.msga2');
-      catsCard.forEach(catsCard => {
-        const linkCat = catsCard.querySelector('.msga2 > a');
+      catsCard.forEach(i => {
+        const linkCat = i.querySelector('.msga2 > a');
         if (linkCat) {
           const detailedUrl = linkCat.href;
           q.push({
@@ -50,23 +35,17 @@ async function parse(url, isDetailed) {
       });
       const next = d.querySelector('msga2 > a');
       if (next) {
-        const nextUrl = 'doska.by' + next.getAttribute('href');
+        const nextUrl ='https://www.doska.by/'+next.getAttribute('href');
         q.push({
           url: nextUrl,
           isDetailed: false
         });
       }
     } else {
-      console.log(`Обработка карточки товара ${url}`);
       const imgCat = d.querySelector('.ads_photo_label > div > div > a').getAttribute('href');
-      console.log(imgCat);
-      data.push({
-        img: imgCat
-      });
-      const updateCat = d.querySelector("td > table > tbody > tr:nth-child(2) > td:nth-child(3)").textContent;
-      data.push({
-        update: updateCat
-      });
+      data.push({img: imgCat});
+      const updateCat = d.querySelector("td > table > tbody > tr:nth-child(2) > td:nth-child(3)").textContent.substr(17, 5);
+      data.push({update: updateCat});
     }
   } catch (e) {
     console.error(e);
@@ -83,6 +62,9 @@ q.push({
 (async() => {
   await q.drain();
   if (data.length > 0) {
+    const now = new Date();
+    const current = now.getHours() + ':' + now.getMinutes();
+    data.push({currentDate: current})
     fs.writeFileSync('./resultDoskaCat.txt', JSON.stringify(data));
     console.log(`Сохранено ${data.length} записей`);
   }

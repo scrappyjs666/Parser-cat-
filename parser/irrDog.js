@@ -15,41 +15,25 @@ async function parse(url, isDetailed) {
     const d = dom.window.document;
     if (!isDetailed) {
       let linkAll = d.querySelectorAll('.listingItem');
-      linkAll.forEach((linkAll) => {
-        let linkhref = ((linkAll.getAttribute('href')));
-        data.push({
-          link: linkhref
-        });
+      linkAll.forEach((i) => {
+        data.push({link: i.getAttribute('href')});
       });
       let priceAll = d.querySelectorAll('div.listingItem__info > span');
-      
-      priceAll.forEach((priceAll) => {
-        let priceText = priceAll.textContent.trim();
-        if(priceText == '') {
-          let priceText = priceAll.innerText = 'Не указана/ Бесплатно!'
-          data.push({
-          price: priceText
-        });
-        }
-        data.push({
-          price: priceText
-        });
+      priceAll.forEach((i) => {
+        let priceText = i.textContent.trim();
+        if(priceText == '') 
+        {priceText = 'Не указана/ Бесплатно!'}
+        data.push({price: priceText});
       });
-      let updateAll = d.querySelectorAll('.general_det_in').childNodes[2];
-      updateAll.forEach((updateAll) => {
-        let updateText = updateAll.textContent.replace(/\s+/g, ' ').trim();
-        data.push({
-          update: updateText
-        });
+      let updateAll = d.querySelectorAll('div.listingItem__info > p:nth-child(5)');
+      updateAll.forEach((i) => {
+        let updateText = i.textContent.replace(/\s+/g, ' ').trim();
+        data.push({update: updateText});
       });
       let nameAll = d.querySelectorAll('.js-listingItemTitle');
-      nameAll.forEach((nameAll) => {
-        let nameText = nameAll.textContent;
-        data.push({
-          name: nameText
-        });
+      nameAll.forEach((i) => {
+        data.push({name: i.textContent});
       });
-      console.log(`Обработка страницы ${url}`);
       const catsCard = d.querySelectorAll('.listingItem');
       catsCard.forEach(catsCard => {
         const linkCat = catsCard;
@@ -61,21 +45,14 @@ async function parse(url, isDetailed) {
           });
         }
       });
-      const next = d.querySelector('li.next > a');
+      const next = d.querySelector('.listingItem');
       if (next) {
-        const nextUrl = 'https://books.toscrape.com/catalogue/' + next.getAttribute('href');
-        q.push({
-          url: nextUrl,
-          isDetailed: false
-        });
+        const nextUrl = next;
+        q.push({url: nextUrl,isDetailed: false});
       }
     } else {
-      console.log(`Обработка карточки товара ${url}`);
       const imgCat = d.querySelector('.carousel__image').getAttribute('data-src');
-      console.log(imgCat);
-      data.push({
-        img: imgCat
-      });
+      data.push({img: imgCat});
     }
   } catch (e) {
     console.error(e);
@@ -92,8 +69,9 @@ q.push({
 (async() => {
   await q.drain();
   if (data.length > 0) {
+    const now = new Date();
+    const current = now.getHours() + ':' + now.getMinutes();
+    data.push({currentDate: current})
     fs.writeFileSync('./resultIrrDog.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей`);
   }
 })();
-

@@ -2,12 +2,16 @@ body {
   font-family: cursive;
 }
 .cat-item {
-  width: 400px;
-  height: 600px;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  max-width: 400px;
+  max-height: 750px;
   border: 1px solid #797abc;
   padding: 10px;
   border-radius: 7px;
   background-color: gray;
+  margin: 200px 0;
 }
 
 .allcats {
@@ -18,9 +22,13 @@ body {
 .cat-title {
   text-align: center;
   font-size: 30px;
+  max-height: 140px;
+  overflow: hidden;
 }
 
 .cat-photo {
+  max-width: 350px;
+  max-height: 400px;
   object-fit: cover;
   border-radius: 10px;
 }

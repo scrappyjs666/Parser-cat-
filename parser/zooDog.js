@@ -14,31 +14,17 @@ async function parse(url, isDetailed) {
     const dom = await JSDOM.fromURL(url);
     const d = dom.window.document;
     if (!isDetailed) {
-      let linkAll = d.querySelectorAll('.title');
-      linkAll.forEach((linkAll) => {
-        let linkhref = ((linkAll.getAttribute('href')));
-        data.push({
-          link: linkhref
-        });
+      d.querySelectorAll('.item_row').forEach(row => {
+        const region = row.querySelector('.item_region > a')?.textContent?.trim();
+        if (region !== 'Минск') return;
+        const price = row.querySelector('.type_button')?.textContent;
+        const name = row.querySelector('.title')?.textContent;
+        const link = 'https://zooby.by/' + row.querySelector('.title').getAttribute('href');
+        data.push({name: name}, {link: link}, {price: price});
       });
-      let nameAll = d.querySelectorAll('.title');
-      nameAll.forEach((nameAll) => {
-        let nameText = nameAll.textContent;
-        data.push({
-          name: nameText
-        });
-      });
-      let priceAll = d.querySelectorAll('.type_button');
-      priceAll.forEach((priceAll) => {
-        let priceText = priceAll.textContent;
-        data.push({
-          price: priceText
-        });
-      });
-      console.log(`Обработка страницы ${url}`);
       const catsCard = d.querySelectorAll('.item_outer_in');
-      catsCard.forEach(catsCard => {
-        const linkCat = catsCard.querySelector('.title');
+      catsCard.forEach(i => {
+        const linkCat = i.querySelector('.title');
         if (linkCat) {
           const detailedUrl = linkCat.href;
           q.push({
@@ -56,16 +42,12 @@ async function parse(url, isDetailed) {
         });
       }
     } else {
-      console.log(`Обработка карточки товара ${url}`);
-      const imgCat = d.querySelector('#djc_mainimage').getAttribute('src');
-      console.log(imgCat);
-      data.push({
-        img: imgCat
-      });
-      const updateCat = d.querySelector('.general_det_in').childNodes[2].textContent.trim();
-      data.push({
-        update: updateCat
-      });
+      let item = d.querySelector('.localization_det > div > span').textContent.trim();
+      if (item !== 'Минск, Беларусь') return
+      const img = 'https://zooby.by/' + d.querySelector('#djc_mainimage').getAttribute('src');
+      const update = d.querySelector('.general_det_in').childNodes[1].textContent.trim()
+      const updateFixed = update.substr(21, 9);
+      data.push({img: img}, {update: updateFixed});
     }
   } catch (e) {
     console.error(e);
@@ -82,7 +64,9 @@ q.push({
 (async() => {
   await q.drain();
   if (data.length > 0) {
+    const now = new Date();
+    const current = now.getHours() + ':' + now.getMinutes();
+    data.push({currentDate: current})
     fs.writeFileSync('./resultZooDog.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей`);
   }
 })();
