@@ -16,7 +16,9 @@
   },
   "dependencies": {
     "async": "^3.2.3",
+    "axios": "^0.26.1",
     "jsdom": "^19.0.0",
+    "node-telegram-bot-api": "^0.56.0",
     "puppeteer": "^13.5.2",
     "requirejs": "^2.3.6"
   }
