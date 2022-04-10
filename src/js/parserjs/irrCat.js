@@ -5,6 +5,7 @@ const queue = require('async/queue');
 const fs = require('fs');
 const data = [];
 function irrCat() {
+  console.log('start')
 async function parse(url, isDetailed) {
   try {
     const dom = await JSDOM.fromURL(url);
@@ -68,7 +69,8 @@ q.push({
     const now = new Date();
     const current = now.getHours() + ':' + now.getMinutes();
     data.push({currentDate: current})
-    fs.writeFileSync('./resultIrrCat.txt', JSON.stringify(data));
+    fs.writeFileSync('./data.txt', JSON.stringify(data));
+    console.log(`Сохранено ${data.length} записей irr`);
   }
 })();
 }

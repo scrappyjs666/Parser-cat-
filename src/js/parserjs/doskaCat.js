@@ -2,9 +2,9 @@ const {
   JSDOM
 } = require('jsdom');
 const queue = require('async/queue');
-const fs = require('fs');
+const fs = require('fs/promises');
 const data = [];
-function doskaCat() {
+async function doskaCat() {
   async function parse(url, isDetailed) {
   try {
     const dom = await JSDOM.fromURL(url);
@@ -13,8 +13,8 @@ function doskaCat() {
       d.querySelectorAll('form>:nth-child(3)>tbody>tr').forEach(i => {
         const url = i.querySelector('.msga2 > a')?.getAttribute('href');
         const link = url ? `https://www.doska.by/${url}` : undefined;
-        const name = i.querySelector('.d1> a')?.textContent;
-        let price = i.querySelector('td:nth-child(6)')?.textContent?.replace(/\s+/g, ' ')?.trim()
+        const name = i.querySelector('.d1> a')?.textContent?.trim();
+        let price = i.querySelector('td:nth-child(6)')?.textContent?.replace(/\s+/g, ' ')?.trim().replace(/(\r\n|\n|\r)/gm, "");
         if(price == '-' || undefined || null)
         {price = 'Не указано/ Бесплатно!'}
         data.push({link: link},{name: name},{price: price});
@@ -53,16 +53,11 @@ q.push({
   url: 'https://www.doska.by/animals/cats/minsk-r/',
   isDetailed: false
 });
-(async() => {
   await q.drain();
   if (data.length > 0) {
-    const now = new Date();
-    const current = now.getHours() + ':' + now.getMinutes();
-    data.push({currentDate: current})
-    fs.writeFileSync('./resultDoskaCat.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей`);
+    await  fs.appendFile('./data.txt', JSON.stringify(data));
+    console.log(`Сохранено ${data.length} записей doska`);
   }
-})();
 }
 
 

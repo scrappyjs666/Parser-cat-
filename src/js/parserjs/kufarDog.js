@@ -26,26 +26,13 @@ const now = new Date();
 const current = now.getHours() + ':' + now.getMinutes();
 data.push(...update, ...img, ...link, ...name, ...price, {currentDate: current});
 if (data.length > 0) {
-  fs.writeFileSync('./resultKufarDog.txt', JSON.stringify(data))
+  fs.writeFileSync('./data.txt', JSON.stringify(data))
 }
 })()
 
 
 
-function createNewitem() {
-  for(let i = 0; nameAr.length> i; i++) {
-    const sample = `      
-      <div class="cat-item">
-        <h3 class="cat-title">${nameAr[i]}</h3>
-        <img src="${imgAr[i]}" alt="" class="cat-photo" />
-        <h4 class="cat-price">${priceAr[i]}</h4>
-        <h5 class="cat-update">Обновлено/добавлено:${updateAr[i]}</h5>
-        <a href="${hreflink[i]}" class="cat-link">Ссылка на объявление</a>
-        <button class="button1">MEM1</button>
-      </div>`
-      allcats.insertAdjacentHTML('beforeend', sample);
-  }
-}
+
 
 // let nameAr = []
 // let hreflink = []

@@ -46,8 +46,8 @@ q.push({
     const now = new Date();
     const current = now.getHours() + ':' + now.getMinutes();
     data.push({currentDate: current})
-    fs.writeFileSync('./resultOnlinerCat.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей`);
+    fs.writeFileSync('./data.txt', JSON.stringify(data));
+    console.log(`Сохранено ${data.length} записей onliner`);
   }
 })();
 }

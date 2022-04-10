@@ -1,39 +1,50 @@
-const async = require("async");
 const fs = require('fs');
 const doskaCat = require('./parserjs/doskaCat')
-// const irrCat = require('./parserjs/irrCat')
-// const kufarCat = require('./parserjs/kufarCat')
-// const onlinerCat = require('./parserjs/onlinerCat')
-// const zooCat = require('./parserjs/zooCat')
-// irrCat();
+const irrCat = require('./parserjs/irrCat')
+const kufarCat = require('./parserjs/kufarCat')
+const onlinerCat = require('./parserjs/onlinerCat')
+const zooCat = require('./parserjs/zooCat')
+// irrCat() 
 // kufarCat();
 // onlinerCat();
 // zooCat();
-// doskaCat()
+// doskaCat();
+
+const TelegramBot = require('node-telegram-bot-api');
+console.log('Запускаю бота')
+
+const token = '5238636103:AAFHRSxSXN1NmjkfQiz9gminJ-KB_VO_iw4';
+
+const bot = new TelegramBot(token, {polling: true});
+
+start()
+async function start() {
+  await Promise.all([kufarCat(), doskaCat()]);
+  createData();
+}
 
 
 
-
-
-
-function startBot() {
+async function createData() {
+console.log('start')
 let data = []
-
-fs.readFile("resultDoskaCat.txt", "utf8", 
-async function(error,dataRes){
+let c = []
+fs.readFile("./data.txt", "utf8", 
+function(error,dataRes){
+  console.log('Читаю данные')
   if(error) throw error; 
-  data = await JSON.parse(dataRes)
+  data = JSON.parse(dataRes.replace(/\]\[/g,'],['));
+  console(data)
+  createitem();
 });
 
-
-console.log(data);
 let nameAr = []
 let hreflink = []
 let imgAr = []
 let priceAr = []
 let updateAr = []
 function createitem() {
-  console.log("Запускаю функцию")
+  console.log('createitm')
   try {
     for(let i = 0; i < data.length-1; i++) {
       if(data[i].name) {nameAr.push(data[i].name)}
@@ -45,37 +56,27 @@ function createitem() {
   } catch(error) {
     console.log(error);
   }
-  console.log(nameAr)
-  console.log(hreflink)
-  console.log(imgAr)
-  console.log(priceAr)
-  console.log(updateAr)
+  console.log(nameAr.length)
+  console.log(hreflink.length)
+  console.log(imgAr.length)
+  console.log(priceAr.length)
+  console.log(updateAr.length)
+  for(let i = 0; nameAr.length> i; i++) {
+  setTimeout(() => {pushMessage(i)}, 5000*i);
 }
-
-createitem();
-const TelegramBot = require('node-telegram-bot-api');
-console.log('1')
-
-const token = '5238636103:AAFHRSxSXN1NmjkfQiz9gminJ-KB_VO_iw4';
-
-const bot = new TelegramBot(token, {polling: true});
-
+}
 function pushMessage(i) {
   const html = `
 <strong>${nameAr[i]}</strong>
 
 <strong>Цена</strong>: ${priceAr[i]}❗
 
-<strong>Изменено</strong>: ${updateAr[i]}
+<strong>Изменено/добавлено</strong>: ${updateAr[i]}
 
 <a href ='${imgAr[i]}'>Фото</a> 📷
 
 <a href="${hreflink[i]}">Ссылка</a>🙏🏻
   `
 bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
-}
-
-for(let i = 0; nameAr.length> i; i++) {
-  setTimeout(() => {pushMessage(i)}, 5000*i);
 }
 }
