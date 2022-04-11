@@ -2,9 +2,9 @@ const {
 JSDOM
 } = require('jsdom');
 const queue = require('async/queue');
-const fs = require('fs');
+const fs = require('fs/promises');
 const data = [];
-function onlinerCat() {
+async function onlinerCat() {
 async function parse(url, isDetailed) {
   try {
     const dom = await JSDOM.fromURL(url);
@@ -25,9 +25,9 @@ async function parse(url, isDetailed) {
         if (i) {q.push({url: i,isDetailed: true});}
       });
     } 
-      const imgDog = d.querySelector('.msgpost-img').getAttribute('src');
-      const nameDog = d.querySelector('.title').textContent;
-      data.push({name: nameDog}, {img: imgDog,});
+      const img = d.querySelector('.msgpost-img').getAttribute('src');
+      const name = d.querySelector('.title').textContent;
+      data.push({name: name}, {img: img,});
   } catch (e) {
     console.error(e);
   }
@@ -40,16 +40,11 @@ q.push({
   url: 'https://baraholka.onliner.by/viewforum.php?f=607&cat=1',
   isDetailed: false
 });
-(async() => {
   await q.drain();
   if (data.length > 0) {
-    const now = new Date();
-    const current = now.getHours() + ':' + now.getMinutes();
-    data.push({currentDate: current})
-    fs.writeFileSync('./data.txt', JSON.stringify(data));
+    fs.appendFile('./data.txt', JSON.stringify(data));
     console.log(`Сохранено ${data.length} записей onliner`);
   }
-})();
 }
 
 module.exports = onlinerCat;

@@ -2,10 +2,9 @@ const {
   JSDOM
 } = require('jsdom');
 const queue = require('async/queue');
-const fs = require('fs');
+const fs = require('fs/promises');
 const data = [];
-function irrCat() {
-  console.log('start')
+async function irrCat() {
 async function parse(url, isDetailed) {
   try {
     const dom = await JSDOM.fromURL(url);
@@ -36,10 +35,7 @@ async function parse(url, isDetailed) {
         const linkCat = catsCard;
         if (linkCat) {
           const detailedUrl = linkCat.href;
-          q.push({
-            url: detailedUrl,
-            isDetailed: true
-          });
+          q.push({url: detailedUrl,isDetailed: true});
         }
       });
       const next = d.querySelector('.listingItem');
@@ -48,7 +44,12 @@ async function parse(url, isDetailed) {
         q.push({url: nextUrl,isDetailed: false});
       }
     } else {
-      const imgCat = d.querySelector('.carousel__image').getAttribute('data-src');
+      let imgCat;
+      if(d.querySelector('.carousel__image')) {
+        imgCat = d.querySelector('.carousel__image').getAttribute('data-src');
+      } else {
+        imgCat = 'Картинки нет'
+      }
       data.push({img: imgCat});
     }
   } catch (e) {
@@ -63,16 +64,11 @@ q.push({
   url: 'http://minsk.m.irr.by/animalsandplants/animals/cats/',
   isDetailed: false
 });
-(async() => {
   await q.drain();
   if (data.length > 0) {
-    const now = new Date();
-    const current = now.getHours() + ':' + now.getMinutes();
-    data.push({currentDate: current})
-    fs.writeFileSync('./data.txt', JSON.stringify(data));
+    await  fs.appendFile('./data.txt', JSON.stringify(data));
     console.log(`Сохранено ${data.length} записей irr`);
   }
-})();
 }
 
 module.exports = irrCat;

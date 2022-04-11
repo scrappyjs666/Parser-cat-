@@ -2,9 +2,9 @@ const {
   JSDOM
 } = require('jsdom');
 const queue = require('async/queue');
-const fs = require('fs');
+const fs = require('fs/promises');
 const data = [];
-function zooCat() {
+async function zooCat() {
 async function parse(url, isDetailed) {
   try {
     const dom = await JSDOM.fromURL(url);
@@ -12,40 +12,15 @@ async function parse(url, isDetailed) {
     if (!isDetailed) {
       d.querySelectorAll('.item_row').forEach(row => {
         const region = row.querySelector('.item_region > a')?.textContent?.trim();
-        if (region !== 'Минск') return;
+        if (region !== 'Минск') return
         const price = row.querySelector('.type_button')?.textContent;
         const name = row.querySelector('.title')?.textContent;
         const link = 'https://zooby.by/' + row.querySelector('.title').getAttribute('href');
-        data.push({
-          name: name}, {link: link}, {price: price});
+        const img = 'https://zooby.by/' + row.querySelector('.item_img_box_in>a>img').getAttribute('src').replace('ths.jpg', 'thb.jpg');;
+        const update = 'Новое!'
+        data.push({name: name}, {link: link}, {price: price}, {img: img}, {update: update});
       });
-      const catsCard = d.querySelectorAll('.item_outer_in');
-      catsCard.forEach(i => {
-        const linkCat = i.querySelector('.title');
-        if (linkCat) {
-          const detailedUrl = linkCat.href;
-          q.push({
-            url: detailedUrl,
-            isDetailed: true
-          });
-        }
-      });
-      const next = d.querySelector('.title');
-      if (next) {
-        const nextUrl = 'https://zooby.by/' + next.getAttribute('href');
-        q.push({
-          url: nextUrl,
-          isDetailed: false
-        });
-      }
-    } else {
-      let item = d.querySelector('.localization_det > div > span').textContent.trim();
-      if (item !== 'Минск, Беларусь') return
-      const img = 'https://zooby.by/' + d.querySelector('#djc_mainimage').getAttribute('src');
-      const update = d.querySelector('.general_det_in').childNodes[1].textContent.trim()
-      const updateFixed = update.substr(21, 9);
-      data.push({img: img}, {update: updateFixed});
-    }
+    } 
   } catch (e) {
     console.error(e);
   }
@@ -58,16 +33,11 @@ q.push({
   url: 'https://zooby.by/v-dobrye-ruki/vozmu-kota',
   isDetailed: false
 });
-(async() => {
   await q.drain();
   if (data.length > 0) {
-    const now = new Date();
-    const current = now.getHours() + ':' + now.getMinutes();
-    data.push({currentDate: current})
-    fs.writeFileSync('./data.txt', JSON.stringify(data));
+    fs.appendFile('./data.txt', JSON.stringify(data));
     console.log(`Сохранено ${data.length} записей zoo`);
   }
-})();
 }
 
 module.exports = zooCat;
