@@ -1,0 +1,9 @@
+/* Глобальные стили */
+@import './global/fonts.css';
+@import './global/vars.css';
+@import './global/base.css';
+@import './global/ui.css';
+@import './global/main.css';
+
+/* Стили для каждой отдельной страницы */
+@import './pages/index.css';
