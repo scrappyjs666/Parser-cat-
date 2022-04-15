@@ -20,12 +20,7 @@ async function doskaCat() {
         data.push({link: link},{name: name},{price: price});
       })
       d.querySelectorAll('.msga2>a').forEach(i => {
-        if (i) {
-          q.push({
-            url: i,
-            isDetailed: true
-          });
-        }
+        if (i) {q.push({url: i,isDetailed: true})}
       });
       const next = d.querySelector('msga2 > a');
       if (next) {
@@ -50,11 +45,65 @@ q.push({
   url: 'https://www.doska.by/animals/cats/minsk-r/',
   isDetailed: false
 });
-  await q.drain();
-  if (data.length > 0) {
-    await  fs.appendFile('./data.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей doska`);
+await q.drain();
+if (data.length > 0) {
+  go();
+
+  function go() {
+    const fs = require('fs')
+    let database = []
+    let dataResult = []
+    let name = []
+    let link = []
+    let img = []
+    let update = []
+    let price = []
+    let result = [];
+    let num = 0;
+    fs.readFile('./data.txt', 'utf8', (error, dataRes) => {
+      if (error) throw error;
+      database = JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+      database = database.flat(Infinity)
+      const parseData = require('../main')
+      })
+      if (database.length) {
+      
+      }
+      if (!database.length) {
+        console.log('NE eeeeeeeeeeeeeeeeeeee')
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].name) {
+            name.push(data[i])
+          }
+          if (data[i].link) {
+            link.push(data[i])
+          }
+          if (data[i].img) {
+            img.push(data[i])
+          }
+          if (data[i].update) {
+            update.push(data[i])
+          }
+          if (data[i].price) {
+            price.push(data[i])
+          }
+        }
+        for (let i = 0; i < name.length; i++) {
+          dataResult.push(name[i], link[i], img[i], update[i], price[i])
+        }
+        let obj;
+        dataResult.forEach(e => {
+          if (num++ === 0) result.push(obj = {});
+          Object.assign(obj, e);
+          if (num === 5) num = 0;
+        });
+        console.log(`Сохранено ${result.length} записей doska`);
+        console.log(result, 'result')
+        const fs = require('fs')
+        fs.appendFileSync('./data.txt', JSON.stringify(result));
+      }
   }
+}
 }
 
 

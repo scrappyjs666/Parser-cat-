@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 //Доделать дату апдейта
 const data = [];
 const puppeteer = require('puppeteer');
-async function kufarCat() {
+async function kufarCat(c) {
 try {
 const browser = await puppeteer.launch()
 const page = await browser.newPage()
