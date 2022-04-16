@@ -3,6 +3,8 @@ const {
 } = require('jsdom');
 const queue = require('async/queue');
 const fs = require('fs/promises');
+
+
 const data = [];
 async function doskaCat() {
   async function parse(url, isDetailed) {
@@ -52,7 +54,7 @@ if (data.length > 0) {
   function go() {
     const fs = require('fs')
     let database = []
-    let dataResult = []
+    let dataintermediateResult = []
     let name = []
     let link = []
     let img = []
@@ -60,48 +62,46 @@ if (data.length > 0) {
     let price = []
     let result = [];
     let num = 0;
-    fs.readFile('./data.txt', 'utf8', (error, dataRes) => {
+    // fs.appendFileSync('./data.txt', JSON.stringify(data));
+    fs.readFile('./data.txt', 'utf8', 
+    async (error, dataRes) => {
       if (error) throw error;
-      database = JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
-      database = database.flat(Infinity)
-      const parseData = require('../main')
-      })
+      database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+      database = await database.flat(Infinity)
       if (database.length) {
-      
+        const prevData = database;
+        let prevDataEdited = prevData.map((el) => {
+          const oldEl = el;
+          oldEl.oldItem = true;
+          return oldEl;
+        });
+        const {filterSourceData, botMessagePush} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+        const newDataIndexes = [];
+        for (let i = 0; i < prevDataEdited.length; i++) {
+          const existedItemIndex = result.findIndex((el) => {
+            return el.link === prevDataEdited[i].link;
+          });
+          if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+        }
+        console.log(newDataIndexes, 'newDataIndexes')
+        let newData = result;
+        newData = newData.filter((el, i) => {
+        return !newDataIndexes.includes(i);
+        });
+        const fullData = [...prevDataEdited, ... newData];
+        console.log(fullData.length, 'fulldata.lenght')
+        fs.writeFileSync('./data.txt', JSON.stringify(fullData));
+        botMessagePush()
+        console.log(`Сохранено ${fullData.length} записей doska`);
       }
       if (!database.length) {
-        console.log('NE eeeeeeeeeeeeeeeeeeee')
-        for (let i = 0; i < data.length; i++) {
-          if (data[i].name) {
-            name.push(data[i])
-          }
-          if (data[i].link) {
-            link.push(data[i])
-          }
-          if (data[i].img) {
-            img.push(data[i])
-          }
-          if (data[i].update) {
-            update.push(data[i])
-          }
-          if (data[i].price) {
-            price.push(data[i])
-          }
-        }
-        for (let i = 0; i < name.length; i++) {
-          dataResult.push(name[i], link[i], img[i], update[i], price[i])
-        }
-        let obj;
-        dataResult.forEach(e => {
-          if (num++ === 0) result.push(obj = {});
-          Object.assign(obj, e);
-          if (num === 5) num = 0;
-        });
-        console.log(`Сохранено ${result.length} записей doska`);
-        console.log(result, 'result')
-        const fs = require('fs')
+        const  {filterSourceData, botMessagePush, botMessagePushFirst} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
         fs.appendFileSync('./data.txt', JSON.stringify(result));
+        botMessagePushFirst(result)
       }
+    })
   }
 }
 }
