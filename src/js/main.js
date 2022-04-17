@@ -1,10 +1,10 @@
-
 // nodejs modules
 const fs = require('fs');
 const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler')
+require('dotenv').config()
 //Telegram bot
 const TelegramBot = require('node-telegram-bot-api');
-const token = '5238636103:AAFHRSxSXN1NmjkfQiz9gminJ-KB_VO_iw4';
+const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, {polling: true});
 //import modules(parser dosk file)
 const doskaCat = require('./parserjs/doskaCat')
@@ -13,99 +13,48 @@ const kufarCat = require('./parserjs/kufarCat')
 const onlinerCat = require('./parserjs/onlinerCat')
 const zooCat = require('./parserjs/zooCat');
 const { data } = require('autoprefixer');
-// const scheduler = new ToadScheduler()
-// const task = new Task('simple task', () => startApp())
-// const job = new SimpleIntervalJob({ seconds: 2100, }, task)
-// scheduler.addSimpleIntervalJob(job)
-// let data = [];
-
-// setInterval(() => {
-//     startApp()
-// }, 20000);
-// startApp()
+const scheduler = new ToadScheduler()
+const task = new Task('simple task', () => allFn())
+const job = new SimpleIntervalJob({ seconds: 1100, }, task)
+scheduler.addSimpleIntervalJob(job)
 
 
-// function startApp() {
-// console.log('start app')
 
-// start()
-// async function start() {
-// await Promise.all([doskaCat()]);
-// createData();
+
+
+
+
+// async function doskaCat() {
+//   return new Promise(res=>setTimeout(()=>{res(1000)}, 1000))
+// }
+// async function fnTwo() {
+//   return new Promise(res=>setTimeout(()=>{res(2000)}, 1200))
 // }
 
 
-// async function createData() {
-// fs.readFile("./data.txt", "utf8", 
-// function(error,dataRes){
-//     console.log('Читаю данные')
-//     if(error) throw error; 
-//     data =  JSON.parse(('['+dataRes+']').replace(/\]\[/g,'],['));
-//     data = data.flat(Infinity)
+const allFn = async ()=>{
+  try {
+    await doskaCat()
+    console.log('Выполнилась 1-я ф-ция')
+    await irrCat()
+    console.log('Выполнилась 2-я ф-ция')
+    await zooCat()
+    console.log('Выполнилась 3-я ф-ция')
+    await onlinerCat()
+    console.log('Выполнилась 4-я ф-ция')
+    await kufarCat()
+    console.log('Выполнилась 5-я ф-ция')
+    await botMessagePush()
+    console.log('Выполнилась 6-я ф-ция')
+  }catch (e) {
+    console.error(e)
+  }
+}
 
-//     let result = [];
-//     let num = 0;
-//     let obj;
-//     data.forEach(e => {
-//     if (num++ === 0) result.push(obj = {});
-//     Object.assign(obj, e);
-//     if (num === 5) num = 0;
-//     });
-
-// // console.log(data)
-// // fs.truncateSync('./data.txt', 0, err => {
-// // if(err) throw err; 
-// // });
-// // fs.appendFileSync('./data.txt', JSON.stringify(data))
-//     createitem();
-// });
-
-// let nameAr = []
-// let hreflink = []
-// let imgAr = []
-// let priceAr = []
-// let updateAr = []
-// function createitem() {
-// console.log('createitm')
-// try {
-// for(let i = 0; i < data.length; i++) {
-//     if(data[i].name) {nameAr.push(data[i].name)}
-//     if(data[i].link) {hreflink.push(data[i].link)} 
-//     if(data[i].img)  {imgAr.push(data[i].img)} 
-//     if(data[i].price) {priceAr.push(data[i].price)}
-//     if(data[i].update) {updateAr.push(data[i].update)}
-// }
-// } catch(error) {
-// console.log(error);
-// }
-// console.log(nameAr.length)
-// console.log(hreflink.length)
-// console.log(imgAr.length)
-// console.log(priceAr.length)
-// console.log(updateAr.length)
-// for(let i = 0; nameAr.length> i; i++) {
-// setTimeout(() => {pushMessage(i)}, 5000*i);
-// }
-// }
-// function pushMessage(i) {
-// const html = `
-// <strong>${nameAr[i]}</strong>
-// <strong>Цена</strong>: ${priceAr[i]}❗
-// <strong>Изменено/добавлено</strong>: ${updateAr[i]}
-// <a href ='${imgAr[i]}'>Фото</a> 📷
-// <a href="${hreflink[i]}">Ссылка</a>🙏🏻
-// `
-// bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
-// }
-// }}
+allFn()
 
 
-
-
-doskaCat()
-
-
-module.exports = {filterSourceData, botMessagePush, botMessagePushFirst}
+module.exports = {filterSourceData}
 
 
 function filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num) {
@@ -125,26 +74,25 @@ function filterSourceData(data, dataintermediateResult, name, link, img, update,
         Object.assign(obj, e);
     if (num === 5) num = 0;
     });
-    console.log(`Сохранено ${result.length} записей doska`);
 }
 
-
-
 function botMessagePush() {
+let database = []
+let filteredData = []
 fs.readFile('./data.txt', 'utf8', 
 async (error, dataRes) => {
 if (error) throw error;
 database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
-database = await database.flat(Infinity)
-})
-console.log(database.length, 'console database.lenght')
-const filteredData = database.filter((el) => {
+database =  database.flat(Infinity)
+filteredData = database.filter((el) => {
 return el.oldItem === undefined;
 });
+console.log(database.length, 'database')
 console.log(filteredData.length, 'filteredData')
 for(let i = 0; filteredData.length> i; i++) {
-setTimeout(() => {pushMessage(i)}, 5000*i);
+setTimeout(() => {pushMessage(i)}, 6000*i);
 }
+})
 function pushMessage(i) {
 const html = `
 <strong>${filteredData[i].name}</strong>
@@ -155,32 +103,11 @@ const html = `
 `
 bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
 }
+return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
 }
 
-function botMessagePushFirst(result) {
-for(let i = 0; result.length> i; i++) {
-setTimeout(() => {pushMessage(i)}, 5000*i);
-}
-function pushMessage(i) {
-const html = `
-<strong>${result[i].name}</strong>
-<strong>Цена</strong>: ${result[i].price}❗
-<strong>Изменено/добавлено</strong>: ${result[i].update}
-<a href ='${result[i].img}'>Фото</a> 📷
-<a href="${result[i].link}">Ссылка</a>🙏🏻
-`
-bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
-}
-}
 
-if(data.length > 4) {
-    data.forEach(i=> [
-        console.log(i)
-    ])
-}
 
-// for(let i =0; data.length > i; i++) {
-//     if(data.length > 3) {
-//         console.log(data.splice(0,1))
-//     }
-// }
+
+
+

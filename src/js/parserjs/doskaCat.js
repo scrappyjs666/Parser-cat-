@@ -4,7 +4,6 @@ const {
 const queue = require('async/queue');
 const fs = require('fs/promises');
 
-
 const data = [];
 async function doskaCat() {
   async function parse(url, isDetailed) {
@@ -49,7 +48,7 @@ q.push({
 });
 await q.drain();
 if (data.length > 0) {
-  go();
+  go(data);
 
   function go() {
     const fs = require('fs')
@@ -62,7 +61,6 @@ if (data.length > 0) {
     let price = []
     let result = [];
     let num = 0;
-    // fs.appendFileSync('./data.txt', JSON.stringify(data));
     fs.readFile('./data.txt', 'utf8', 
     async (error, dataRes) => {
       if (error) throw error;
@@ -75,7 +73,7 @@ if (data.length > 0) {
           oldEl.oldItem = true;
           return oldEl;
         });
-        const {filterSourceData, botMessagePush} = require('../main')
+        const {filterSourceData} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
         const newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
@@ -84,26 +82,22 @@ if (data.length > 0) {
           });
           if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
         }
-        console.log(newDataIndexes, 'newDataIndexes')
         let newData = result;
         newData = newData.filter((el, i) => {
         return !newDataIndexes.includes(i);
         });
         const fullData = [...prevDataEdited, ... newData];
-        console.log(fullData.length, 'fulldata.lenght')
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
-        botMessagePush()
         console.log(`Сохранено ${fullData.length} записей doska`);
       }
       if (!database.length) {
-        const  {filterSourceData, botMessagePush, botMessagePushFirst} = require('../main')
+        const  {filterSourceData} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
         fs.appendFileSync('./data.txt', JSON.stringify(result));
-        botMessagePushFirst(result)
       }
     })
   }
-}
+}return new Promise(res=>setTimeout(()=>{res(2000)}, 1200))
 }
 
 

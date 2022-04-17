@@ -16,8 +16,11 @@ async function parse(url, isDetailed) {
         const price = row.querySelector('.type_button')?.textContent;
         const name = row.querySelector('.title')?.textContent;
         const link = 'https://zooby.by/' + row.querySelector('.title').getAttribute('href');
-        const img = 'https://zooby.by/' + row.querySelector('.item_img_box_in>a>img').getAttribute('src').replace('ths', 'thb');;
-        const update = 'Новое!'
+        let img
+        if(row.querySelector('.item_img_box_in>a>img').getAttribute('src')) {
+          img = 'https://zooby.by/' + row.querySelector('.item_img_box_in>a>img').getAttribute('src').replace('ths', 'thb');
+        } else {img = 'Картинки нет'}
+        const update = 'Недавно обновлено/добавлено!'
         data.push({name: name}, {link: link}, {price: price}, {img: img}, {update: update});
       });
     } 
@@ -34,10 +37,57 @@ q.push({
   isDetailed: false
 });
   await q.drain();
-  if (data.length > 0) {
-    fs.appendFile('./data.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей zoo`);
-  }
+    if (data.length > 0) {
+  go();
+  function go() {
+    const fs = require('fs')
+    let database = []
+    let dataintermediateResult = []
+    let name = []
+    let link = []
+    let img = []
+    let update = []
+    let price = []
+    let result = [];
+    let num = 0;
+    fs.readFile('./data.txt', 'utf8', 
+    async (error, dataRes) => {
+      if (error) throw error;
+      database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+      database = await database.flat(Infinity)
+      if (database.length) {
+        const prevData = database;
+        let prevDataEdited = prevData.map((el) => {
+          const oldEl = el;
+          oldEl.oldItem = true;
+          return oldEl;
+        });
+        const {filterSourceData} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+        const newDataIndexes = [];
+        for (let i = 0; i < prevDataEdited.length; i++) {
+          const existedItemIndex = result.findIndex((el) => {
+            return el.link === prevDataEdited[i].link;
+          });
+          if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+        }
+        let newData = result;
+        newData = newData.filter((el, i) => {
+        return !newDataIndexes.includes(i);
+        });
+        const fullData = [...prevDataEdited, ... newData];
+        fs.writeFileSync('./data.txt', JSON.stringify(fullData));
+        console.log(`Сохранено ${fullData.length} записей zoo`);
+      }
+      if (!database.length) {
+        const  {filterSourceData} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+        fs.appendFileSync('./data.txt', JSON.stringify(result));
+      }
+    })
+  }}
+  return new Promise(res=>setTimeout(()=>{res(2000)}, 2000))
 }
 
 module.exports = zooCat;
+

@@ -25,7 +25,10 @@ async function parse(url, isDetailed) {
         if (i) {q.push({url: i,isDetailed: true});}
       });
     } 
-      const img = d.querySelector('.msgpost-img').getAttribute('src');
+      let img;
+      if(d.querySelector('.msgpost-img').getAttribute('src')) {
+        img = d.querySelector('.msgpost-img').getAttribute('src');
+      } else {img = 'Картинки нет'}
       const name = d.querySelector('.title').textContent;
       data.push({name: name}, {img: img,});
   } catch (e) {
@@ -42,9 +45,55 @@ q.push({
 });
   await q.drain();
   if (data.length > 0) {
-    fs.appendFile('./data.txt', JSON.stringify(data));
-    console.log(`Сохранено ${data.length} записей onliner`);
-  }
+  go();
+  function go() {
+    const fs = require('fs')
+    let database = []
+    let dataintermediateResult = []
+    let name = []
+    let link = []
+    let img = []
+    let update = []
+    let price = []
+    let result = [];
+    let num = 0;
+    fs.readFile('./data.txt', 'utf8', 
+    async (error, dataRes) => {
+      if (error) throw error;
+      database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+      database = await database.flat(Infinity)
+      if (database.length) {
+        const prevData = database;
+        let prevDataEdited = prevData.map((el) => {
+          const oldEl = el;
+          oldEl.oldItem = true;
+          return oldEl;
+        });
+        const {filterSourceData} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+        const newDataIndexes = [];
+        for (let i = 0; i < prevDataEdited.length; i++) {
+          const existedItemIndex = result.findIndex((el) => {
+            return el.link === prevDataEdited[i].link;
+          });
+          if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+        }
+        let newData = result;
+        newData = newData.filter((el, i) => {
+        return !newDataIndexes.includes(i);
+        });
+        const fullData = [...prevDataEdited, ... newData];
+        fs.writeFileSync('./data.txt', JSON.stringify(fullData));
+        console.log(`Сохранено ${fullData.length} записей onliner`);
+      }
+      if (!database.length) {
+        const  {filterSourceData} = require('../main')
+        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+        fs.appendFileSync('./data.txt', JSON.stringify(result));
+      }
+    })
+  }}
+  return new Promise(res=>setTimeout(()=>{res(2000)}, 1800))
 }
 
 module.exports = onlinerCat;
