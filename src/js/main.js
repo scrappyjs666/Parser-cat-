@@ -15,7 +15,7 @@ const zooCat = require('./parserjs/zooCat');
 const { data } = require('autoprefixer');
 const scheduler = new ToadScheduler()
 const task = new Task('simple task', () => allFn())
-const job = new SimpleIntervalJob({ seconds: 1100, }, task)
+const job = new SimpleIntervalJob({ seconds: 42000, }, task)
 scheduler.addSimpleIntervalJob(job)
 
 
@@ -34,18 +34,14 @@ scheduler.addSimpleIntervalJob(job)
 
 const allFn = async ()=>{
   try {
-    await doskaCat()
+    await onlinerCat()
     console.log('Выполнилась 1-я ф-ция')
     await irrCat()
     console.log('Выполнилась 2-я ф-ция')
-    await zooCat()
+    await doskaCat()
     console.log('Выполнилась 3-я ф-ция')
-    await onlinerCat()
+    await zooCat()
     console.log('Выполнилась 4-я ф-ция')
-    await kufarCat()
-    console.log('Выполнилась 5-я ф-ция')
-    await botMessagePush()
-    console.log('Выполнилась 6-я ф-ция')
   }catch (e) {
     console.error(e)
   }
@@ -54,7 +50,7 @@ const allFn = async ()=>{
 allFn()
 
 
-module.exports = {filterSourceData}
+module.exports = {filterSourceData, botMessagePush}
 
 
 function filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num) {
@@ -76,23 +72,115 @@ function filterSourceData(data, dataintermediateResult, name, link, img, update,
     });
 }
 
-function botMessagePush() {
-let database = []
-let filteredData = []
-fs.readFile('./data.txt', 'utf8', 
-async (error, dataRes) => {
-if (error) throw error;
-database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
-database =  database.flat(Infinity)
-filteredData = database.filter((el) => {
+// async function botMessagePush() {
+// let database = []
+// let filteredData = []
+// fs.readFile('./data.txt', 'utf8', 
+// async (error, dataRes) => {
+// if (error) throw error;
+// database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+// database =  database.flat(Infinity)
+// filteredData = database.filter((el) => {
+// return el.oldItem === undefined;
+// });
+// console.log(database.length, 'database')
+// console.log(filteredData.length, 'filteredData')
+
+// for(let i = 0; filteredData.length> i; i++) {
+// setTimeout(() => {pushMessage(i)}, 6000*i);
+// }
+// })
+// function pushMessage(i) {
+// const html = `
+// <strong>${filteredData[i].name}</strong>
+// <strong>Цена</strong>: ${filteredData[i].price}❗
+// <strong>Изменено/добавлено</strong>: ${filteredData[i].update}
+// <a href ='${filteredData[i].img}'>Фото</a> 📷
+// <a href="${filteredData[i].link}">Ссылка</a>🙏🏻
+// `
+// bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
+// }
+// // return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
+// }
+
+
+
+
+
+// function findDublicate() {
+// let database = []
+// let filteredData = []
+// fs.readFile('./data.txt', 'utf8', 
+// async (error, dataRes) => {
+// if (error) throw error;
+// database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
+// database =  database.flat(Infinity)
+// filteredData = database.filter((el) => {
+// return el.oldItem === undefined;
+// });
+// console.log(database.length, 'database')
+// console.log(filteredData.length, 'filteredData')})
+// const prevData = database;
+// let prevDataEdited = prevData.map((el) => {
+//     const oldEl = el;
+//     oldEl.oldItem = true;
+//     return oldEl;
+// });
+// const {filterSourceData} = require('../main')
+// filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+// const newDataIndexes = [];
+// for (let i = 0; i < prevDataEdited.length; i++) {
+//     const existedItemIndex = result.findIndex((el) => {
+//     return el.link === prevDataEdited[i].link;
+//     });
+//     if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+// }
+// let newData = result;
+// newData = newData.filter((el, i) => {
+// return !newDataIndexes.includes(i);
+// });
+// }
+
+
+
+
+
+
+
+
+
+
+// comment 
+// const prevData = database;
+// let prevDataEdited = prevData.map((el) => {
+//     const oldEl = el;
+//     oldEl.oldItem = true;
+//     return oldEl;
+// });
+// const {filterSourceData} = require('../main')
+// filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
+// const newDataIndexes = [];
+// for (let i = 0; i < prevDataEdited.length; i++) {
+//     const existedItemIndex = result.findIndex((el) => {
+//     return el.link === prevDataEdited[i].link;
+//     });
+//     if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+// }
+// let newData = result;
+// newData = newData.filter((el, i) => {
+// return !newDataIndexes.includes(i);
+// });
+
+
+function botMessagePush(fullData) {
+console.log('запуск пуша')
+let filteredData = fullData.filter((el) => {
 return el.oldItem === undefined;
 });
-console.log(database.length, 'database')
-console.log(filteredData.length, 'filteredData')
+console.log(filteredData.length, 'filterData111')
 for(let i = 0; filteredData.length> i; i++) {
 setTimeout(() => {pushMessage(i)}, 6000*i);
 }
-})
 function pushMessage(i) {
 const html = `
 <strong>${filteredData[i].name}</strong>
@@ -103,11 +191,4 @@ const html = `
 `
 bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
 }
-return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
 }
-
-
-
-
-
-

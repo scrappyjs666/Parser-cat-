@@ -46,7 +46,7 @@ q.push({
   await q.drain();
   if (data.length > 0) {
   go();
-  function go() {
+  async function go() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -69,7 +69,7 @@ q.push({
           oldEl.oldItem = true;
           return oldEl;
         });
-        const {filterSourceData} = require('../main')
+        const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
         const newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
@@ -83,6 +83,7 @@ q.push({
         return !newDataIndexes.includes(i);
         });
         const fullData = [...prevDataEdited, ... newData];
+        botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей onliner`);
       }
@@ -93,7 +94,7 @@ q.push({
       }
     })
   }}
-  return new Promise(res=>setTimeout(()=>{res(2000)}, 1800))
+  return new Promise(res=>setTimeout(()=>{res(2000)}, 1400))
 }
 
 module.exports = onlinerCat;

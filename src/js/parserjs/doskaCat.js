@@ -50,7 +50,7 @@ await q.drain();
 if (data.length > 0) {
   go(data);
 
-  function go() {
+  async function go() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -73,7 +73,7 @@ if (data.length > 0) {
           oldEl.oldItem = true;
           return oldEl;
         });
-        const {filterSourceData} = require('../main')
+        const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
         const newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
@@ -87,6 +87,7 @@ if (data.length > 0) {
         return !newDataIndexes.includes(i);
         });
         const fullData = [...prevDataEdited, ... newData];
+        botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей doska`);
       }
@@ -97,11 +98,9 @@ if (data.length > 0) {
       }
     })
   }
-}return new Promise(res=>setTimeout(()=>{res(2000)}, 1200))
+}
+return new Promise(res=>setTimeout(()=>{res(2000)}, 1800))
 }
 
 
 module.exports = doskaCat;
-
-
-
