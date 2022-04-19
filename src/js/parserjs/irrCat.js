@@ -106,14 +106,9 @@ q.push({
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей irr`);
       }
-      if (!database.length) {
-        const  {filterSourceData} = require('../main')
-        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        fs.appendFileSync('./data.txt', JSON.stringify(result));
-      }
     })
   }}
-  return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
+  // return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
 }
 
 module.exports = irrCat;

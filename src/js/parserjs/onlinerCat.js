@@ -26,10 +26,10 @@ async function parse(url, isDetailed) {
       });
     } 
       let img;
-      if(d.querySelector('.msgpost-img').getAttribute('src')) {
-        img = d.querySelector('.msgpost-img').getAttribute('src');
-      } else {img = 'Картинки нет'}
-      const name = d.querySelector('.title').textContent;
+      if(d.querySelector('.msgpost-img')) {
+        img = d.querySelector('.msgpost-img')?.getAttribute('src');
+      }
+      const name = d.querySelector('.title')?.textContent;
       data.push({name: name}, {img: img,});
   } catch (e) {
     console.error(e);
@@ -87,14 +87,9 @@ q.push({
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей onliner`);
       }
-      if (!database.length) {
-        const  {filterSourceData} = require('../main')
-        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        fs.appendFileSync('./data.txt', JSON.stringify(result));
-      }
     })
   }}
-  return new Promise(res=>setTimeout(()=>{res(2000)}, 1400))
+  // return new Promise(res=>setTimeout(()=>{res(2000)}, 1400))
 }
 
 module.exports = onlinerCat;

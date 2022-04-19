@@ -1,30 +1,23 @@
 const fs = require('fs/promises');
-//Доделать дату апдейта
 const data = [];
 const puppeteer = require('puppeteer');
 async function kufarCat() {
 try {
 const browser = await puppeteer.launch()
 const page = await browser.newPage()
-await page.goto('https://www.kufar.by/l/r~minsk/sobaki?cursor=eyJ0IjoicmVsIiwiYyI6W3sibiI6Imxpc3RfdGltZSIsInYiOjE2NTAxOTQ1NTkwMDB9LHsibiI6ImFkX2lkIiwidiI6MTU0MzA2MTE1fV0sImYiOnRydWV9')
+await page.goto('https://www.kufar.by/l/r~minsk/koshki')
 const update = await page.evaluate(() => {
 return [...document.querySelectorAll('section > a > div > div > div > span')].map(i => ({
 update: i.innerText}))
 })
 const img = await page.evaluate(() => {
-return[...document.querySelectorAll('section > a')].filter((value, index) => index > 2).map(i => ({
-img: i.querySelector('div > div > div > img:nth-child(2)').getAttribute('data-src')
-}))
-})
-let image = []
-await page.evaluate((image) => {
-[...document.querySelectorAll('section>a')].filter((value, index) => index > 2).forEach(i =>{
-  if(i.querySelector('div > div > div > img:nth-child(2)')) {
-    image.push(i.querySelector('div > div > div > img:nth-child(2)').getAttribute('data-src'))
-  } else {
-    image.push('Картинки Нет')
-  }
-})
+return [...document.querySelectorAll('section > a')].filter((value, index) => index > 2).map(i => {
+const el = i.querySelector('div > div > div > img:nth-child(2)');
+if (el) return {
+img: el.getAttribute('data-src')}
+if(!el) return {
+img: 'Картинки нет'
+}})
 })
 const link = await page.evaluate(() => {
 return [...document.querySelectorAll('section > a')].filter((value, index) => index > 2).map(i => ({
@@ -57,20 +50,35 @@ data.push(...update, ...img, ...link, ...name, ...price);
       if (error) throw error;
       database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
       database = await database.flat(Infinity)
-      if(database.length > 2000) {
-        const length  = database.length - 2000
-        data.splice(0, length)
+      if(database.length > 2500) {
+        console.log('обрезаем лишнее', database.length)
+        const length  = database.length - 2500
+        database.splice(0, length)
       }
-      if (database.length) {
-        const {filterSourceData} = require('../main')
+       if (database.length) {
+        const prevData = database;
+        let prevDataEdited = prevData.map((el) => {
+          const oldEl = el;
+          oldEl.oldItem = true;
+          return oldEl;
+        });
+        const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        fs.appendFileSync('./data.txt', JSON.stringify(result));
-        console.log(`Сохранено ${result.length} записей kufar`);
-      }
-      if (!database.length) {
-        const  {filterSourceData} = require('../main')
-        filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        fs.appendFileSync('./data.txt', JSON.stringify(result));
+        const newDataIndexes = [];
+        for (let i = 0; i < prevDataEdited.length; i++) {
+          const existedItemIndex = result.findIndex((el) => {
+            return el.link === prevDataEdited[i].link;
+          });
+          if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
+        }
+        let newData = result;
+        newData = newData.filter((el, i) => {
+        return !newDataIndexes.includes(i);
+        });
+        const fullData = [...prevDataEdited, ... newData];
+        botMessagePush(fullData)
+        fs.writeFileSync('./data.txt', JSON.stringify(fullData));
+        console.log(`Сохранено ${fullData.length} записей kufar`);
       }
     })
   }}
