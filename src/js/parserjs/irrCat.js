@@ -3,7 +3,7 @@ const {
 } = require('jsdom');
 const queue = require('async/queue');
 const fs = require('fs/promises');
-const data = [];
+let data = [];
 async function irrCat() {
 async function parse(url, isDetailed) {
   try {
@@ -64,8 +64,8 @@ q.push({
 });
   await q.drain();
   if (data.length > 0) {
-  go();
-  async function go() {
+  СreatingValidDate();
+  async function СreatingValidDate() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -82,7 +82,7 @@ q.push({
       database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
       database = await database.flat(Infinity)
       if (database.length) {
-        const prevData = database;
+        let prevData = database;
         let prevDataEdited = prevData.map((el) => {
           const oldEl = el;
           oldEl.oldItem = true;
@@ -90,9 +90,9 @@ q.push({
         });
         const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        const newDataIndexes = [];
+        let newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
-          const existedItemIndex = result.findIndex((el) => {
+          let existedItemIndex = result.findIndex((el) => {
             return el.link === prevDataEdited[i].link;
           });
           if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
@@ -101,10 +101,23 @@ q.push({
         newData = newData.filter((el, i) => {
         return !newDataIndexes.includes(i);
         });
-        const fullData = [...prevDataEdited, ... newData];
+        let fullData = [...prevDataEdited, ... newData];
         botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей irr`);
+        prevData = []
+        prevDataEdited = []
+        newDataIndexes = []
+        database = []
+        dataintermediateResult = []
+        name = []
+        link = []
+        img = []
+        update = []
+        price = []
+        result = [];
+        num = 0;
+        data = []
       }
     })
   }}

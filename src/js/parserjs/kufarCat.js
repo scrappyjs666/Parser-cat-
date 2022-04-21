@@ -1,5 +1,5 @@
 const fs = require('fs/promises');
-const data = [];
+let data = [];
 const puppeteer = require('puppeteer');
 async function kufarCat() {
 try {
@@ -33,8 +33,8 @@ price: i.textContent.trim()}))
 })
 data.push(...update, ...img, ...link, ...name, ...price);
  if (data.length > 0) {
-  go();
-  function go() {
+  СreatingValidDate();
+  function СreatingValidDate() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -50,13 +50,13 @@ data.push(...update, ...img, ...link, ...name, ...price);
       if (error) throw error;
       database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
       database = await database.flat(Infinity)
-      if(database.length > 2500) {
+      if(database.length > 1200) {
         console.log('обрезаем лишнее', database.length)
-        const length  = database.length - 2500
+        const length  = database.length - 1200
         database.splice(0, length)
       }
-       if (database.length) {
-        const prevData = database;
+      if (database.length) {
+        let prevData = database;
         let prevDataEdited = prevData.map((el) => {
           const oldEl = el;
           oldEl.oldItem = true;
@@ -64,9 +64,9 @@ data.push(...update, ...img, ...link, ...name, ...price);
         });
         const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        const newDataIndexes = [];
+        let newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
-          const existedItemIndex = result.findIndex((el) => {
+          let existedItemIndex = result.findIndex((el) => {
             return el.link === prevDataEdited[i].link;
           });
           if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
@@ -75,10 +75,23 @@ data.push(...update, ...img, ...link, ...name, ...price);
         newData = newData.filter((el, i) => {
         return !newDataIndexes.includes(i);
         });
-        const fullData = [...prevDataEdited, ... newData];
+        let fullData = [...prevDataEdited, ... newData];
         botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей kufar`);
+        prevData = []
+        prevDataEdited = []
+        newDataIndexes = []
+        database = []
+        dataintermediateResult = []
+        name = []
+        link = []
+        img = []
+        update = []
+        price = []
+        result = [];
+        num = 0;
+        data = []
       }
     })
   }}

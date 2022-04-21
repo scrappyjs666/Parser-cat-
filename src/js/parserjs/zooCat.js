@@ -4,7 +4,7 @@ const {
 const queue = require('async/queue');
 const fs = require('fs/promises');
 
-const data = [];
+let data = [];
 async function zooCat() {
 async function parse(url, isDetailed) {
   try {
@@ -42,7 +42,7 @@ async function parse(url, isDetailed) {
         img = 'Картинки нету'
       }
       const update = d.querySelector('.general_det_in').childNodes[1].textContent.trim()
-      const updateFixed = update.substr(25, 9);
+      const updateFixed = update.substr(22, 5);
       data.push({img: img}, {update: updateFixed});
     }
   } catch (e) {
@@ -59,8 +59,8 @@ q.push({
 });
 await q.drain();
 if (data.length > 0) {
-  go(data);
-  async function go() {
+  СreatingValidDate();
+  async function СreatingValidDate() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -77,7 +77,7 @@ if (data.length > 0) {
       database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
       database = await database.flat(Infinity)
       if (database.length) {
-        const prevData = database;
+        let prevData = database;
         let prevDataEdited = prevData.map((el) => {
           const oldEl = el;
           oldEl.oldItem = true;
@@ -85,9 +85,9 @@ if (data.length > 0) {
         });
         const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        const newDataIndexes = [];
+        let newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
-          const existedItemIndex = result.findIndex((el) => {
+          let existedItemIndex = result.findIndex((el) => {
             return el.link === prevDataEdited[i].link;
           });
           if (existedItemIndex !== -1) {newDataIndexes.push(existedItemIndex)}
@@ -96,10 +96,23 @@ if (data.length > 0) {
         newData = newData.filter((el, i) => {
         return !newDataIndexes.includes(i);
         });
-        const fullData = [...prevDataEdited, ... newData];
+        let fullData = [...prevDataEdited, ... newData];
         botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей zoo`);
+        prevData = []
+        prevDataEdited = []
+        newDataIndexes = []
+        database = []
+        dataintermediateResult = []
+        name = []
+        link = []
+        img = []
+        update = []
+        price = []
+        result = [];
+        num = 0;
+        data = []
       }
       // if (!database.length) {
       //   const  {filterSourceData} = require('../main')

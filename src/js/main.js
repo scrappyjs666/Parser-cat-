@@ -1,55 +1,47 @@
-
-// nodejs modules
 const fs = require('fs');
-const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler')
+const { all } = require('async');
+// nodejs modules
 require('dotenv').config()
 //Telegram bot
 const TelegramBot = require('node-telegram-bot-api');
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, {polling: true});
+
+
+
 //import modules(parser dosk file)
-const doskaCat = require('./parserjs/doskaCat')
-const irrCat = require('./parserjs/irrCat')
-const kufarCat = require('./parserjs/kufarCat')
-const onlinerCat = require('./parserjs/onlinerCat')
-const zooCat = require('./parserjs/zooCat');
-// module for interval app launch
-  // const scheduler = new ToadScheduler()
-  // const task = new Task('simple task', () => node, main.js)
-  // const job = new SimpleIntervalJob({ seconds: 120, }, task)
-  // scheduler.addSimpleIntervalJob(job)
+const doskaCatModule = require('./parserjs/doskaCat')
+const irrCatModule = require('./parserjs/irrCat')
+const kufarCatModule = require('./parserjs/kufarCat')
+const onlinerCatModule = require('./parserjs/onlinerCat')
+const zooCatModule = require('./parserjs/zooCat');
+const { ToadScheduler, SimpleIntervalJob, Task } = require('toad-scheduler');
 
+const scheduler = new ToadScheduler()
 
-// console.log('a')
-// const cron = require('node-cron');
+const task = new Task('simple task', () => allFn())
+const job = new SimpleIntervalJob({ seconds: 420, }, task)
 
-// cron.schedule(' * * * * * *', () => {
+scheduler.addSimpleIntervalJob(job)
 
-//   console.log('start')
-// });
-
-
-
-
-
-//launch functions
+// launch functions
 const allFn = async ()=>{
   try {
-    await onlinerCat()
+    await onlinerCatModule()
     console.log('Выполнилась 1-я ф-ция')
-    await irrCat()
+    await irrCatModule()
     console.log('Выполнилась 2-я ф-ция')
-    await doskaCat()
+    await doskaCatModule()
     console.log('Выполнилась 3-я ф-ция')
-    await zooCat()
+    await zooCatModule()
     console.log('Выполнилась 4-я ф-ция')
-    await kufarCat() 
+    await kufarCatModule() 
     console.log('Выполнилась 5-я ф-ция')
   }catch (e) {
     console.error(e)
   }
 }
-allFn()
+// allFn()
 
 //function for filtering incoming data (source array)
 function filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num) {
@@ -94,3 +86,4 @@ bot.sendMessage(-1001517877678, html, {parse_mode: 'HTML'} )
 }
 
 module.exports = {filterSourceData, botMessagePush}
+

@@ -4,7 +4,7 @@ const {
 const queue = require('async/queue');
 const fs = require('fs/promises');
 
-const data = [];
+let data = [];
 async function doskaCat() {
   async function parse(url, isDetailed) {
   try {
@@ -48,9 +48,8 @@ q.push({
 });
 await q.drain();
 if (data.length > 0) {
-  go(data);
-
-  async function go() {
+  СreatingValidDate();
+  async function СreatingValidDate() {
     const fs = require('fs')
     let database = []
     let dataintermediateResult = []
@@ -67,15 +66,15 @@ if (data.length > 0) {
       database = await JSON.parse(('[' + dataRes + ']').replace(/\]\[/g, '],['));
       database = await database.flat(Infinity)
       if (database.length) {
-        const prevData = database;
-        let prevDataEdited = prevData.map((el) => {
+        let prevData = database;
+        let prevDataEdited = await prevData.map((el) => {
           const oldEl = el;
           oldEl.oldItem = true;
           return oldEl;
         });
         const {filterSourceData, botMessagePush} = require('../main')
         filterSourceData(data, dataintermediateResult, name, link, img, update, price, result, num)
-        const newDataIndexes = [];
+        let newDataIndexes = [];
         for (let i = 0; i < prevDataEdited.length; i++) {
           const existedItemIndex = result.findIndex((el) => {
             return el.link === prevDataEdited[i].link;
@@ -90,6 +89,19 @@ if (data.length > 0) {
         botMessagePush(fullData)
         fs.writeFileSync('./data.txt', JSON.stringify(fullData));
         console.log(`Сохранено ${fullData.length} записей doska`);
+        prevData = []
+        prevDataEdited = []
+        newDataIndexes = []
+        database = []
+        dataintermediateResult = []
+        name = []
+        link = []
+        img = []
+        update = []
+        price = []
+        result = [];
+        num = 0;
+        data = []
       }
     })
   }
