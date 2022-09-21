@@ -28,15 +28,10 @@ scheduler.addSimpleIntervalJob(job)
 const allFn = async ()=>{
   try {
     await onlinerCatModule()
-    console.log('Выполнилась 1-я ф-ция')
     await irrCatModule()
-    console.log('Выполнилась 2-я ф-ция')
     await doskaCatModule()
-    console.log('Выполнилась 3-я ф-ция')
     await zooCatModule()
-    console.log('Выполнилась 4-я ф-ция')
     await kufarCatModule() 
-    console.log('Выполнилась 5-я ф-ция')
   }catch (e) {
     console.error(e)
   }
