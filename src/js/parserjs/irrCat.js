@@ -121,7 +121,6 @@ q.push({
       }
     })
   }}
-  // return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
 }
 
 module.exports = irrCat;
