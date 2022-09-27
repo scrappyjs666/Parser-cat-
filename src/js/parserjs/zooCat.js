@@ -122,7 +122,6 @@ if (data.length > 0) {
     })
   }
 }
-// return new Promise(res=>setTimeout(()=>{res(2000)}, 2000))
 }
 
 module.exports = zooCat;
