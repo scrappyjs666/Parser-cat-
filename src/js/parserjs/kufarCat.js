@@ -98,7 +98,6 @@ data.push(...update, ...img, ...link, ...name, ...price);
 } catch(error) {
   console.log(error)
 }
-// return new Promise(res=>setTimeout(()=>{res(2000)}, 1600))
 }
 module.exports = kufarCat;
 
